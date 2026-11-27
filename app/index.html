@@ -4,18 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI Photo Manager</title>
-<meta name="description" content="Back up your phone's photos to your own PC over Wi-Fi, privately. Offline AI to search, tag and tidy them. For Windows, with Android and iOS companion apps.">
+<meta name="description" content="Back up photos from your phone to your PC over Wi-Fi. No cloud, no account. A Windows photo manager with offline AI search, tags, faces and duplicate finder.">
 <meta property="og:title" content="AI Photo Manager">
-<meta property="og:description" content="Your photos. Your PC. Nothing in between.">
+<meta property="og:description" content="Phone photos, backed up to your PC. No cloud. No account.">
 <meta property="og:image" content="img/1-my-photos.jpg">
 <link rel="icon" href="img/logo.png">
 <style>
 :root{
   --bg:#ffffff; --alt:#f5f5f7; --ink:#1d1d1f; --muted:#6e6e73; --line:#d2d2d7;
-  --accent:#6b4fbb; --accent-ink:#fff; --dark:#000; --dark-ink:#f5f5f7; --dark-muted:#a1a1a6; --ok:#30d158;
+  --accent:#6b4fbb; --accent-ink:#fff; --dark:#000; --dark-ink:#f5f5f7; --dark-muted:#a1a1a6;
+  --glow:rgba(107,79,187,.22);
 }
 @media (prefers-color-scheme:dark){
-  :root{--bg:#000;--alt:#111113;--ink:#f5f5f7;--muted:#a1a1a6;--line:#2c2c2e;--accent:#b79cff;--accent-ink:#1a1030}
+  :root{--bg:#000;--alt:#111113;--ink:#f5f5f7;--muted:#a1a1a6;--line:#2c2c2e;--accent:#b79cff;--accent-ink:#1a1030;--glow:rgba(183,156,255,.18)}
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -23,7 +24,8 @@ body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.47 -apple-system
 a{color:var(--accent);text-decoration:none}
 a:hover{text-decoration:underline}
 :focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:8px}
-.wrap{max-width:980px;margin:0 auto;padding:0 22px}
+img{max-width:100%}
+.wrap{max-width:1040px;margin:0 auto;padding:0 22px}
 .center{text-align:center}
 
 /* nav */
@@ -41,59 +43,86 @@ header nav a:hover{opacity:1;text-decoration:none}
 
 /* type */
 .kicker{font-size:clamp(17px,2.2vw,21px);font-weight:600;color:var(--accent);margin:0 0 8px}
-h1{font-size:clamp(44px,9vw,92px);line-height:1.03;font-weight:700;letter-spacing:-.04em;margin:0}
-h2{font-size:clamp(34px,6vw,64px);line-height:1.07;font-weight:700;letter-spacing:-.035em;margin:0}
-.lead{font-size:clamp(19px,2.6vw,28px);line-height:1.25;color:var(--muted);font-weight:500;letter-spacing:-.015em;margin:18px auto 0;max-width:34em}
+h1{font-size:clamp(42px,8.4vw,84px);line-height:1.04;font-weight:700;letter-spacing:-.04em;margin:0}
+h2{font-size:clamp(32px,5.6vw,60px);line-height:1.07;font-weight:700;letter-spacing:-.035em;margin:0}
+.lead{font-size:clamp(19px,2.5vw,26px);line-height:1.28;color:var(--muted);font-weight:500;letter-spacing:-.015em;margin:18px auto 0;max-width:30em}
 .links{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:center;align-items:center;margin-top:28px;font-size:19px}
 .btn{display:inline-block;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:12px 24px;font-weight:600;font-size:17px}
 .btn:hover{text-decoration:none;filter:brightness(1.08)}
+.phones{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;align-items:stretch;margin-top:26px}
+.pcard{display:flex;align-items:center;gap:14px;border:1px solid var(--line);border-radius:18px;padding:12px 18px 12px 12px;background:var(--bg);color:var(--ink);text-align:left}
+a.pcard:hover{text-decoration:none;border-color:var(--accent)}
+.pcard .qr{width:92px;height:92px;border-radius:10px;background:#fff;image-rendering:pixelated;flex:none}
+.pcard .qr.soon{display:flex;align-items:center;justify-content:center;background:var(--alt);border:1px dashed var(--line);color:var(--muted);font-size:12px;font-weight:600;text-align:center;padding:6px;image-rendering:auto}
+.pcard b{display:block;font-size:17px;letter-spacing:-.01em}
+.pcard small{display:block;color:var(--muted);font-size:13px;margin-top:2px;line-height:1.3}
+.pcard.off{opacity:.8}
+@media(max-width:700px),(hover:none){.pcard{padding:10px 18px;border-radius:999px}.pcard .qr{display:none}.pcard small{display:none}}
 .more:after{content:" \203A"}
-.fine{font-size:13px;color:var(--muted);margin-top:14px}
 
 section{padding:110px 0}
 @media(max-width:700px){section{padding:72px 0}}
 .alt{background:var(--alt)}
-@media(max-width:600px){h1 br,h2 br{display:none}h2{text-wrap:balance}}
+@media(max-width:600px){h1 br,h2 br{display:none}h2,h1{text-wrap:balance}}
+
+/* screens: PC window and phone frame */
+.win{border-radius:12px;border:1px solid var(--line);background:var(--bg);box-shadow:0 40px 90px -30px rgba(0,0,0,.4),0 0 0 1px rgba(0,0,0,.03);overflow:hidden}
+.win img{display:block;width:100%;height:auto}
+.phone{border-radius:34px;border:7px solid #1d1d1f;background:#1d1d1f;box-shadow:0 30px 70px -20px rgba(0,0,0,.5);overflow:hidden}
+.phone img{display:block;width:100%;height:auto;border-radius:26px}
+@media (prefers-color-scheme:dark){.phone{border-color:#3a3a3c;background:#3a3a3c}.win{box-shadow:0 40px 90px -30px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.06)}}
 
 /* hero */
 .hero{padding:72px 0 0;text-align:center;overflow:hidden}
-.hero .shotwrap{margin:64px auto 0;max-width:1000px;padding:0 22px}
-.shot{display:block;width:100%;height:auto;border-radius:14px 14px 0 0;border:1px solid var(--line);border-bottom:0;box-shadow:0 -10px 60px -20px rgba(0,0,0,.25)}
+.stage{position:relative;max-width:1000px;margin:64px auto 0;padding:0 22px 0}
+.stage:before{content:"";position:absolute;left:8%;right:8%;top:10%;bottom:-10%;background:radial-gradient(closest-side,var(--glow),transparent);z-index:0}
+.stage .win{position:relative;z-index:1;border-radius:12px 12px 0 0;border-bottom:0}
+.stage .phone{position:absolute;z-index:2;width:21%;left:0;bottom:-6%;transform:rotate(-3deg)}
+@media(max-width:600px){.stage .phone{width:28%;left:4px}}
+.badges{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px;font-size:14px;color:var(--muted)}
+.badges span{border:1px solid var(--line);border-radius:999px;padding:3px 12px}
 
-/* steps */
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:56px;margin-top:80px;text-align:left}
-@media(max-width:760px){.steps{grid-template-columns:1fr;gap:40px;margin-top:56px}}
+/* backup */
+.flow{display:grid;grid-template-columns:minmax(150px,230px) 1fr minmax(0,560px);align-items:center;gap:28px;margin:72px auto 0;max-width:960px}
+.flow .phone{width:100%}
+.beam{height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);position:relative;min-width:40px}
+.beam:after{content:"";position:absolute;top:-4px;left:0;width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 16px var(--accent);animation:travel 2.6s ease-in-out infinite}
+@keyframes travel{0%{left:0;opacity:0}15%{opacity:1}85%{opacity:1}100%{left:calc(100% - 10px);opacity:0}}
+.flowcap{font-size:13px;color:var(--muted);text-align:center;margin-top:10px}
+.flow figcaption{font-size:14px;color:var(--muted);text-align:center;margin-top:12px}
+.flow figure{margin:0}
+@media(max-width:760px){.flow{grid-template-columns:1fr;gap:20px;max-width:360px}.beam{width:2px;height:56px;margin:0 auto;background:linear-gradient(180deg,transparent,var(--accent),transparent)}.beam:after{display:none}.flow .phone{width:62%;margin:0 auto}}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:48px;margin-top:88px;text-align:left}
+@media(max-width:760px){.steps{grid-template-columns:1fr;gap:36px;margin-top:56px}}
 .num{font-size:15px;font-weight:700;color:var(--accent);margin-bottom:10px}
-.step h3{font-size:28px;line-height:1.14;letter-spacing:-.025em;margin:0 0 10px;font-weight:700}
-.step p{margin:0;color:var(--muted);font-size:19px;line-height:1.37}
+.step h3{font-size:26px;line-height:1.14;letter-spacing:-.025em;margin:0 0 10px;font-weight:700}
+.step p{margin:0;color:var(--muted);font-size:18px;line-height:1.4}
+
+/* feature rows */
+.row{display:grid;grid-template-columns:1fr 1.5fr;gap:56px;align-items:center;margin-top:96px;text-align:left}
+.row.flip{grid-template-columns:1.5fr 1fr}
+.row.flip .txt{order:2}
+@media(max-width:860px){.row,.row.flip{grid-template-columns:1fr;gap:28px;margin-top:64px}.row.flip .txt{order:0}}
+.row h3{font-size:clamp(26px,3.4vw,38px);line-height:1.1;letter-spacing:-.03em;margin:0 0 12px}
+.row p{margin:0;color:var(--muted);font-size:19px;line-height:1.4}
+
+/* ai grid */
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:36px;margin-top:88px;text-align:left}
+@media(max-width:860px){.grid4{grid-template-columns:repeat(2,1fr);gap:28px}}
+@media(max-width:480px){.grid4{grid-template-columns:1fr}}
+.grid4 h3{font-size:20px;margin:0 0 6px;letter-spacing:-.02em}
+.grid4 p{margin:0;color:var(--muted);font-size:16px;line-height:1.4}
 
 /* secure */
 .secure{background:var(--dark);color:var(--dark-ink)}
 .secure .kicker{color:#cdbcff}
 .secure .lead{color:var(--dark-muted)}
-.route{display:flex;align-items:center;justify-content:center;gap:0;margin:72px auto 0;max-width:640px}
-.node{width:96px;height:96px;border-radius:26px;border:1px solid #2c2c2e;background:#0b0b0d;display:grid;place-items:center;color:#fff;flex:none}
-.node svg{width:42px;height:42px}
-.wire{flex:1;height:2px;background:linear-gradient(90deg,#2c2c2e,#8e6bff,#2c2c2e);position:relative}
-.wire:after{content:"";position:absolute;top:-3px;left:0;width:8px;height:8px;border-radius:50%;background:#cdbcff;box-shadow:0 0 14px #8e6bff;animation:travel 2.6s ease-in-out infinite}
-@keyframes travel{0%{left:0;opacity:0}15%{opacity:1}85%{opacity:1}100%{left:calc(100% - 8px);opacity:0}}
-.route-cap{display:flex;justify-content:space-between;max-width:640px;margin:14px auto 0;color:var(--dark-muted);font-size:14px}
-.route-cap span{width:96px;text-align:center}
-.route-cap em{flex:1;font-style:normal;text-align:center;color:#cdbcff}
-.facts{display:grid;grid-template-columns:repeat(2,1fr);gap:44px 64px;margin-top:96px;text-align:left}
-@media(max-width:760px){.facts{grid-template-columns:1fr;gap:32px;margin-top:64px}}
-.facts h3{font-size:24px;margin:0 0 6px;letter-spacing:-.02em}
-.facts p{margin:0;color:var(--dark-muted);font-size:18px;line-height:1.4}
-.caveat{margin-top:56px;color:var(--dark-muted);font-size:14px}
-
-/* ai */
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:40px;margin-top:72px;text-align:left}
-@media(max-width:860px){.grid4{grid-template-columns:repeat(2,1fr);gap:32px}}
-@media(max-width:480px){.grid4{grid-template-columns:1fr}}
-.grid4 h3{font-size:21px;margin:0 0 6px;letter-spacing:-.02em}
-.grid4 p{margin:0;color:var(--muted);font-size:16px;line-height:1.4}
-.wide{margin:80px auto 0;max-width:900px}
-.wide img{display:block;width:100%;height:auto;border-radius:14px;border:1px solid var(--line);box-shadow:0 30px 80px -30px rgba(0,0,0,.35)}
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:36px;margin-top:72px;text-align:left}
+@media(max-width:900px){.facts{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.facts{grid-template-columns:1fr;gap:28px;margin-top:52px}}
+.facts h3{font-size:21px;margin:0 0 6px;letter-spacing:-.02em}
+.facts p{margin:0;color:var(--dark-muted);font-size:16px;line-height:1.4}
+.caveat{margin-top:48px;color:var(--dark-muted);font-size:14px}
 
 /* closing */
 .closing{text-align:center}
@@ -105,7 +134,7 @@ footer a{color:var(--muted)}
 html[lang="en"] [data-l="en"],html[lang="vi"] [data-l="vi"]{display:revert}
 .rv{opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s ease}
 .rv.in{opacity:1;transform:none}
-@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}.wire:after{animation:none;left:calc(50% - 4px);opacity:1}html{scroll-behavior:auto}}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}.beam:after{animation:none;left:calc(50% - 5px);opacity:1}html{scroll-behavior:auto}}
 </style>
 </head>
 <body>
@@ -114,8 +143,8 @@ html[lang="en"] [data-l="en"],html[lang="vi"] [data-l="vi"]{display:revert}
     <a class="brand" href="#top"><img src="img/logo.png" alt=""><span>AI Photo Manager</span></a>
     <nav>
       <a class="hide" href="#backup"><span data-l="en">Backup</span><span data-l="vi">Sao lưu</span></a>
+      <a class="hide" href="#app"><span data-l="en">The app</span><span data-l="vi">Ứng dụng</span></a>
       <a class="hide" href="#secure"><span data-l="en">Security</span><span data-l="vi">Bảo mật</span></a>
-      <a class="hide" href="#ai"><span data-l="en">AI</span><span data-l="vi">AI</span></a>
       <button class="lang" id="lang" type="button" aria-label="Language">VI</button>
       <a class="get" href="https://apps.microsoft.com/detail/9P01B5L7XSC3"><span data-l="en">Get</span><span data-l="vi">Tải</span></a>
     </nav>
@@ -125,22 +154,40 @@ html[lang="en"] [data-l="en"],html[lang="vi"] [data-l="vi"]{display:revert}
 <main id="top">
 <div class="hero">
   <div class="wrap">
-    <p class="kicker"><span data-l="en">For Windows 10 &amp; 11</span><span data-l="vi">Dành cho Windows 10 &amp; 11</span></p>
-    <h1><span data-l="en">Your photos. <br>Your PC. <br>Nothing in between.</span><span data-l="vi">Ảnh của bạn. <br>Máy của bạn. <br>Không ai khác.</span></h1>
-    <p class="lead"><span data-l="en">Back up photos from your phone to your PC over Wi-Fi.<br>No cloud. No account.<br>Offline AI helps you find and organize them.</span><span data-l="vi">Sao lưu ảnh từ điện thoại về máy tính qua Wi-Fi.<br>Không đám mây, không tài khoản.<br>AI chạy ngoại tuyến giúp bạn tìm và sắp xếp ảnh.</span></p>
+    <p class="kicker"><span data-l="en">For Windows 10 &amp; 11, with Android and iOS apps</span><span data-l="vi">Cho Windows 10 &amp; 11, kèm app Android và iOS</span></p>
+    <h1><span data-l="en">Phone photos, <br>backed up to your PC.</span><span data-l="vi">Ảnh điện thoại, <br>sao lưu về máy tính.</span></h1>
+    <p class="lead"><span data-l="en">Over your own Wi-Fi. No cloud. No account. Then find any photo with offline AI.</span><span data-l="vi">Qua Wi-Fi nhà bạn. Không đám mây, không tài khoản. Rồi tìm mọi ảnh bằng AI ngoại tuyến.</span></p>
     <div class="links">
       <a class="btn" href="https://apps.microsoft.com/detail/9P01B5L7XSC3"><span data-l="en">Get it from Microsoft Store</span><span data-l="vi">Tải từ Microsoft Store</span></a>
       <a class="more" href="#backup"><span data-l="en">See how backup works</span><span data-l="vi">Xem cách sao lưu</span></a>
     </div>
+    <div class="phones">
+      <a class="pcard" href="https://apps.apple.com/us/app/id6837610322">
+        <img class="qr" src="img/qr-appstore.svg" width="92" height="92" alt="QR code for the iOS app on the App Store">
+        <span><b>App Store</b><small><span data-l="en">Scan with your iPhone</span><span data-l="vi">Quét bằng iPhone</span></small></span>
+      </a>
+      <div class="pcard off" aria-disabled="true">
+        <span class="qr soon"><span data-l="en">QR soon</span><span data-l="vi">QR sắp có</span></span>
+        <span><b>Google Play</b><small><span data-l="en">Coming soon for Android</span><span data-l="vi">Sắp ra mắt cho Android</span></small></span>
+      </div>
+    </div>
   </div>
-  <div class="shotwrap"><img class="shot" src="img/1-my-photos.jpg" width="1920" height="1080" alt="AI Photo Manager on Windows showing a grid of photos, with the AI card and familiar faces on the right"></div>
+  <div class="stage">
+    <div class="win"><img src="img/1-my-photos.jpg" width="1920" height="1080" alt="AI Photo Manager on Windows: a library of photos with the AI card and familiar faces on the right"></div>
+    <div class="phone"><img src="img/phone-photos.jpg" width="760" height="899" alt="The phone app showing photos ready to send to the PC"></div>
+  </div>
 </div>
 
 <section id="backup">
   <div class="wrap center">
     <p class="kicker rv"><span data-l="en">Phone backup</span><span data-l="vi">Sao lưu điện thoại</span></p>
-    <h2 class="rv"><span data-l="en">Backup that <br>just works.</span><span data-l="vi">Sao lưu <br>đơn giản.</span></h2>
-    <p class="lead rv"><span data-l="en">The Android and iOS apps send photos straight to your PC. Set it up once, in three steps.</span><span data-l="vi">App Android và iOS gửi ảnh thẳng về máy tính. Cài đặt một lần, chỉ ba bước.</span></p>
+    <h2 class="rv"><span data-l="en">From your phone <br>to your PC. Simply.</span><span data-l="vi">Từ điện thoại <br>về máy tính. Đơn giản.</span></h2>
+    <p class="lead rv"><span data-l="en">The phone app sends photos straight to the Windows app, and they appear in the same library.</span><span data-l="vi">App điện thoại gửi ảnh thẳng sang app Windows, và ảnh hiện ngay trong cùng thư viện.</span></p>
+    <div class="flow rv">
+      <figure><div class="phone"><img src="img/phone-photos.jpg" width="760" height="899" loading="lazy" alt="Phone app photo grid"></div><figcaption><span data-l="en">Phone</span><span data-l="vi">Điện thoại</span></figcaption></figure>
+      <div class="beam" aria-hidden="true"></div>
+      <figure><div class="win"><img src="img/1-my-photos.jpg" width="1920" height="1080" loading="lazy" alt="Windows app library with photos from the phone"></div><figcaption><span data-l="en">Windows PC, same Wi-Fi</span><span data-l="vi">Máy tính Windows, cùng Wi-Fi</span></figcaption></figure>
+    </div>
     <div class="steps">
       <div class="step rv"><div class="num">1</div><h3><span data-l="en">Turn on sharing on your PC.</span><span data-l="vi">Bật chia sẻ trên máy tính.</span></h3><p><span data-l="en">One switch in the Windows app. It's off until you turn it on.</span><span data-l="vi">Một nút bật trong app Windows. Mặc định tắt, chỉ chạy khi bạn bật.</span></p></div>
       <div class="step rv"><div class="num">2</div><h3><span data-l="en">Pair your phone with a code.</span><span data-l="vi">Ghép điện thoại bằng mã.</span></h3><p><span data-l="en">Enter the code once. Only paired phones can connect.</span><span data-l="vi">Nhập mã một lần. Chỉ điện thoại đã ghép mới kết nối được.</span></p></div>
@@ -149,17 +196,35 @@ html[lang="en"] [data-l="en"],html[lang="vi"] [data-l="vi"]{display:revert}
   </div>
 </section>
 
+<section id="app" class="alt">
+  <div class="wrap center">
+    <p class="kicker rv"><span data-l="en">The Windows app</span><span data-l="vi">Ứng dụng Windows</span></p>
+    <h2 class="rv"><span data-l="en">One library. <br>Every photo in reach.</span><span data-l="vi">Một thư viện. <br>Mọi ảnh trong tầm tay.</span></h2>
+
+    <div class="row rv">
+      <div class="txt"><h3><span data-l="en">Browse it all in one place.</span><span data-l="vi">Xem tất cả ở một nơi.</span></h3><p><span data-l="en">Photos from your PC and your phone sit side by side, with an AI panel and familiar faces within one click.</span><span data-l="vi">Ảnh trên máy tính và điện thoại nằm cạnh nhau, bảng AI và khuôn mặt quen thuộc chỉ cách một cú bấm.</span></p></div>
+      <div class="win"><img src="img/1-my-photos.jpg" width="1920" height="1080" loading="lazy" alt="The My photos page with the AI card and familiar faces"></div>
+    </div>
+
+    <div class="row flip rv">
+      <div class="win"><img src="img/2-similar-photos.jpg" width="1920" height="1080" loading="lazy" alt="The Similar photos page with groups of near-identical photos selected for removal"></div>
+      <div class="txt"><h3><span data-l="en">Clear out the near-duplicates.</span><span data-l="vi">Dọn ảnh gần giống nhau.</span></h3><p><span data-l="en">Burst shots and retakes are grouped for you. Keep the best one and send the rest to the Recycle Bin.</span><span data-l="vi">Ảnh chụp liên tiếp và chụp lại được gom thành nhóm. Giữ tấm đẹp nhất, phần còn lại chuyển vào Thùng rác.</span></p></div>
+    </div>
+
+    <div class="grid4">
+      <div class="rv"><h3><span data-l="en">Search by meaning</span><span data-l="vi">Tìm theo ý nghĩa</span></h3><p><span data-l="en">Type "beach sunset" and it shows up.</span><span data-l="vi">Gõ "hoàng hôn trên biển" là thấy ngay.</span></p></div>
+      <div class="rv"><h3><span data-l="en">Automatic tags</span><span data-l="vi">Thẻ tự động</span></h3><p><span data-l="en">Every photo gets descriptive tags.</span><span data-l="vi">Mỗi ảnh được gắn thẻ mô tả tự động.</span></p></div>
+      <div class="rv"><h3><span data-l="en">People</span><span data-l="vi">Khuôn mặt</span></h3><p><span data-l="en">Faces are grouped by person. Name them once.</span><span data-l="vi">Khuôn mặt được gom theo từng người. Đặt tên một lần.</span></p></div>
+      <div class="rv"><h3><span data-l="en">Offline</span><span data-l="vi">Ngoại tuyến</span></h3><p><span data-l="en">The AI models are built in and run on your PC.</span><span data-l="vi">Mô hình AI có sẵn trong app và chạy ngay trên máy.</span></p></div>
+    </div>
+  </div>
+</section>
+
 <section id="secure" class="secure">
   <div class="wrap center">
     <p class="kicker rv"><span data-l="en">Secure connection</span><span data-l="vi">Kết nối an toàn</span></p>
-    <h2 class="rv"><span data-l="en">Straight from your phone <br>to your PC. That's it.</span><span data-l="vi">Từ điện thoại <br>thẳng về máy tính. Chỉ vậy thôi.</span></h2>
+    <h2 class="rv"><span data-l="en">Straight to your PC. <br>Nothing in between.</span><span data-l="vi">Thẳng về máy tính. <br>Không qua ai khác.</span></h2>
     <p class="lead rv"><span data-l="en">Photos travel over your own Wi-Fi and never reach a cloud server.</span><span data-l="vi">Ảnh đi qua Wi-Fi nhà bạn, không bao giờ qua máy chủ đám mây.</span></p>
-    <div class="route rv" aria-hidden="true">
-      <div class="node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg></div>
-      <div class="wire"></div>
-      <div class="node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></div>
-    </div>
-    <div class="route-cap rv"><span><span data-l="en">Phone</span><span data-l="vi">Điện thoại</span></span><em><span data-l="en">Your Wi-Fi only</span><span data-l="vi">Chỉ Wi-Fi nhà bạn</span></em><span>Windows</span></div>
     <div class="facts">
       <div class="rv"><h3><span data-l="en">Paired devices only.</span><span data-l="vi">Chỉ thiết bị đã ghép.</span></h3><p><span data-l="en">You need the pairing code to connect. Any device without it is refused.</span><span data-l="vi">Phải có mã ghép mới kết nối được. Thiết bị không có mã sẽ bị từ chối.</span></p></div>
       <div class="rv"><h3><span data-l="en">No cloud in the middle.</span><span data-l="vi">Không qua đám mây.</span></h3><p><span data-l="en">No account, no upload, no tracking. Your photos stay on your own devices.</span><span data-l="vi">Không tài khoản, không tải lên, không thu thập dữ liệu. Ảnh chỉ nằm trên thiết bị của bạn.</span></p></div>
@@ -167,21 +232,6 @@ html[lang="en"] [data-l="en"],html[lang="vi"] [data-l="vi"]{display:revert}
       <div class="rv"><h3><span data-l="en">Your originals stay yours.</span><span data-l="vi">Bản gốc vẫn của bạn.</span></h3><p><span data-l="en">Nothing is changed, moved or deleted without your say-so.</span><span data-l="vi">Không có gì bị sửa, di chuyển hay xóa nếu bạn chưa đồng ý.</span></p></div>
     </div>
     <p class="caveat rv"><span data-l="en">To stay safe, turn on Wi-Fi sharing only on networks you trust.</span><span data-l="vi">Để an toàn, chỉ bật chia sẻ Wi-Fi trên mạng bạn tin cậy.</span></p>
-  </div>
-</section>
-
-<section id="ai" class="alt">
-  <div class="wrap center">
-    <p class="kicker rv"><span data-l="en">Offline AI</span><span data-l="vi">AI ngoại tuyến</span></p>
-    <h2 class="rv"><span data-l="en">Then find any photo. <br>No Internet needed.</span><span data-l="vi">Rồi tìm bất kỳ ảnh nào. <br>Không cần Internet.</span></h2>
-    <p class="lead rv"><span data-l="en">The AI models are built into the app and run on your PC.</span><span data-l="vi">Mô hình AI có sẵn trong app và chạy ngay trên máy của bạn.</span></p>
-    <div class="grid4">
-      <div class="rv"><h3><span data-l="en">Search by meaning</span><span data-l="vi">Tìm theo ý nghĩa</span></h3><p><span data-l="en">Type "beach sunset" and it shows up.</span><span data-l="vi">Gõ "hoàng hôn trên biển" là thấy ngay.</span></p></div>
-      <div class="rv"><h3><span data-l="en">Automatic tags</span><span data-l="vi">Thẻ tự động</span></h3><p><span data-l="en">Every photo gets descriptive tags.</span><span data-l="vi">Mỗi ảnh được gắn thẻ mô tả tự động.</span></p></div>
-      <div class="rv"><h3><span data-l="en">People</span><span data-l="vi">Khuôn mặt</span></h3><p><span data-l="en">Faces are grouped by person. Name them once.</span><span data-l="vi">Khuôn mặt được gom theo từng người. Đặt tên một lần.</span></p></div>
-      <div class="rv"><h3><span data-l="en">Similar photos</span><span data-l="vi">Ảnh tương tự</span></h3><p><span data-l="en">Spot near-duplicates and keep the best one.</span><span data-l="vi">Tìm ảnh gần giống nhau, giữ tấm đẹp nhất.</span></p></div>
-    </div>
-    <div class="wide rv"><img src="img/2-similar-photos.jpg" width="1920" height="1080" loading="lazy" alt="The Similar photos page with groups of near-identical photos selected for removal"></div>
   </div>
 </section>
 
